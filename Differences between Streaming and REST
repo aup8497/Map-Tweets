@@ -1,0 +1,3 @@
+Differences between Streaming and REST
+
+Connecting to the streaming API requires keeping a persistent HTTP connection open. In many cases this involves thinking about your application differently than if you were interacting with the REST API. For an example, consider a web application which accepts user requests, makes one or more requests to Twitter’s API, then formats and prints the result to the user, as a response to the user’s initial request:

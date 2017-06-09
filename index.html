@@ -1,0 +1,387 @@
+<html ng-app="mapApp" ng-controller="mapController"  >
+<head >
+
+    <title>Tweet-Map</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js" ></script>
+<!-- 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ==" crossorigin=""/>
+    <script src="./leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
+ -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+   integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+   crossorigin=""></script>
+
+
+</head>
+<body >
+
+<div id="mapid" style="width: 1900px; height: 1000px;"></div>
+
+<style>
+    .pin
+    {
+        width: 40px;
+        height: 40px;
+        border-radius: 75% 50% 75% 0;
+        background: #f0000f;
+        position: absolute;
+        transform: rotate(-45deg);
+        /*left: 50%;*/
+        /*top: 50%;*/
+        margin: -20px 0 0 -20px;
+    }
+    /*.pin::after{*/
+        /*content: '';*/
+        /*width: 14px;*/
+        /*height: 14px;*/
+        /*margin: 8px 0 0 8px;*/
+        /*background: #3333ff;*/
+        /*position: absolute;*/
+        /*border-radius: 75% 50% 75% 50%;*/
+    /*}*/
+</style>
+
+
+    <script >
+
+        // console.log("came to 1");
+        // var app = angular.module('mapApp',[]);
+        // console.log("came to 2");
+        // app.controller( 'mapController' ,function( $http){
+        //     console.log("came in contoller ");
+        //     $http({
+        //         method: 'GET',
+        //         url: 'http://developers.lightmetrics.co/api/v2/GetTripEventsVideo?tripid=20170511133723742&driverid=353487070524121&starttime=2017-05-11-13-37-23-776',
+        //         headers : {
+        //             "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2NhbCI6eyJlbWFpbCI6ImFrc2hheXVwY29kZUBsaWdodG1ldHJpY3MuY28iLCJwYXNzd29yZCI6IiQyYSQwOCRGUUlCak1xQk5id3V3aTN0ZG14OHlPaUwyNDczbHZha1hOdVkyLk5MdmcxRFprY1Q2RlMwNiIsImRibmFtZSI6ImRiX3Byb2Nlc3NlZF9jdXN0b21lcnRlc3QifSwiaWF0IjoxNDk2OTI5MDE2LCJleHAiOjE0OTcwMTU0MTZ9.EKKm65ssRt-DZHEY1W25WjPFgEUfv0ZEe64nUwmL8sM",
+        //             "acc_name" : "local" ,
+        //             "databasename" : "db_processed_customertest"
+        //         }
+        //     }).then(function successCallback(response) {
+        //         console.log("came to 3");
+        //         console.log("logging response " +  response.data);
+        //         var markers = response.data.Events;
+        //         console.log("markers" + markers);
+
+        //         console.log("coming out and printing markers" + markers);
+
+
+        //         var mymap = L.map('mapid')
+        //                 .setView([markers[1].lat,markers[1].lon], 15);
+
+        //         L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //             attribution: '&copy;<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        //             subdomains: ['a', 'b', 'c']
+        //         }).addTo( mymap );
+
+
+        //         var polyline = L.polyline(markers , {opacity: 0} ).addTo(mymap);
+
+        //         for ( var i=0; i < markers.length; ++i )
+        //         {
+        //             L.marker( [markers[i].lat, markers[i].lon] )
+        //                     .addTo( mymap )
+        //                     .bindPopup( '<h2>' + "EventType : " + markers[i].eventtype + '</h2> <h3>' + "Time : " + markers[i].ts + '</h3> <a href="' + markers[i].videolink + '" target="_blank">' + "link to video" + '</a>' );
+        //         }
+
+        //         var bounds = new L.LatLngBounds(markers);
+        //         mymap.fitBounds(bounds,[70,70]);
+        //         // zoom the map to the invisible polyline
+        //         mymap.fitBounds(polyline.getBounds());
+
+        //     }, function errorCallback(response) {
+        //         alert("json not loaded");
+        //         console.log("not loaded json")
+        //     });
+        // });
+
+// format of the twitter feed that I'm getting
+// { coordinates: [ [Object] ],
+//     place_name: 'Camberwell, London',
+//     profile_image_url: 'http://pbs.twimg.com/profile_images/837980168614526976/BZ-ECdjY_normal.jpg',
+//     text: '@semblicemendeme Non hai avuto un immediato bisogno di mangiare qualcosa?',
+//     source: '<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>' }
+
+
+
+ console.log("came to 1");
+        var app = angular.module('mapApp',[]);
+        console.log("came to 2");
+        app.controller( 'mapController' ,function( $http , $interval){
+            console.log("came in contoller ");
+
+            console.log("came to httpget method");
+
+
+                var mymap = L.map('mapid')
+                        .setView([ 13 ,76], 2);
+
+
+setInterval(function(){
+
+    console.log("came inside the function again");
+
+            $http({
+                method: 'GET',
+                url: 'https://tweet-map-live.herokuapp.com:5000/tweetsGet',
+                // headers : {
+                    // "Access-Control-Allow-Origin" : "http://localhost:5000"
+                //     "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2NhbCI6eyJlbWFpbCI6ImFrc2hheXVwY29kZUBsaWdodG1ldHJpY3MuY28iLCJwYXNzd29yZCI6IiQyYSQwOCRGUUlCak1xQk5id3V3aTN0ZG14OHlPaUwyNDczbHZha1hOdVkyLk5MdmcxRFprY1Q2RlMwNiIsImRibmFtZSI6ImRiX3Byb2Nlc3NlZF9jdXN0b21lcnRlc3QifSwiaWF0IjoxNDk2OTI5MDE2LCJleHAiOjE0OTcwMTU0MTZ9.EKKm65ssRt-DZHEY1W25WjPFgEUfv0ZEe64nUwmL8sM",
+                //     "acc_name" : "local" ,
+                //     "databasename" : "db_processed_customertest"
+                // }
+            }).then(function successCallback(response) {
+                console.log("came to 3");
+                console.log("logging response " +  response.data);
+                // var markers = response.data.Events;
+                // console.log("markers" + markers);
+
+                // console.log("coming out and printing markers" + markers);
+                
+                var markers=[]
+                markers=response.data;
+
+
+                L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy;<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    subdomains: ['a', 'b', 'c']
+                }).addTo( mymap );
+
+
+                // var polyline = L.polyline(markers , {opacity: 0} ).addTo(mymap);
+
+                for ( var i=0; i < markers.length; ++i )
+                {
+                    L.marker( [markers[i].coordinates[0][0][1], markers[i].coordinates[0][0][0]] )
+                            .addTo( mymap )
+                            .bindPopup( '<img src='+markers[i].profile_image_url + '></img> <h3>' + "Tweet : " + markers[i].text + '</h3> <h3>' + "Place : " + markers[i].place_name + '</h3>' + markers[i].source ).openPopup();
+                }
+
+
+                // var bounds = new L.LatLngBounds(markers);
+                // mymap.fitBounds(bounds,[70,70]);
+                // // zoom the map to the invisible polyline
+                // mymap.fitBounds(polyline.getBounds());
+
+            }, function errorCallback(response) {
+                console.log("response=" + response.data);
+                alert("json not loaded");
+                console.log("not loaded json")
+            });
+
+
+
+}, 1000)
+
+
+
+
+
+        });
+
+
+
+
+
+
+
+        //setting pin type
+        //                var myIcon = L.icon({
+        //                    iconUrl: './marker-icon.png',
+        ////                    iconSize: [35, 35],
+        //                    iconAnchor: [20, 28] ,
+        ////                    popupAnchor: [-3, -76],
+        ////                    shadowSize: [68, 95],
+        ////                    shadowAnchor: [22, 94]
+        //                });
+
+        //                var myIcon = L.divIcon({
+        //                    path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+        ////                    path:iconshape,
+        //                    fillColor: [255,12,30],
+        //                    fillOpacity: 1,
+        //                    strokeColor: '#000',
+        //                    strokeWeight: 2,
+        //                    scale: 0.6
+        ////
+        ////                background:red,
+        ////                border:5px solid rgba(255,255,255,0.5),
+        ////                color: blue ,
+        ////                font-weight: "bold",
+        ////                text-align:"center"",
+        ////                border-radius:50%,
+        ////                line-height:30px
+        //                });
+
+        //                Myicon= new L.DivIcon({
+        //                    iconSize: new L.Point(10, 10),
+        //                    iconSize: new L.Point(10, 10),
+        //                    className: 'leaflet-div-icon leaflet-editing-icon my-own-class'
+        //                });
+        //                var myIcon = L.divIcon({className: 'pin'});
+
+
+
+
+
+
+
+        //                var popup = L.popup();
+        //                function onMapClick(e) {
+        //                    popup
+        //                            .setLatLng(e.latlng)
+        //                            .setContent("You clicked the map at " + e.latlng.toString())
+        //                            .openOn(mymap);
+        //                }
+
+        //                mymap.on('click', onMapClick);
+
+        //                var bounds = markers.getBounds();
+        //                mymap.fitBounds(bounds);
+        //                mymap.addLayer(markers);
+
+
+
+        //                var group = L.featureGroup(markers); //add markers array to featureGroup
+        //                mymap.fitBounds(group.getBounds());
+        //                mymap.addLayer(markers);
+
+    </script>
+
+<!--<script>-->
+    <!--markers = [-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-26-57-435",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.084370",-->
+            <!--"lon": "77.593987",-->
+            <!--"violationVal": "-1",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_12_594_383_167_133_58_6_20170511_142658.jpg"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-26-58-441",-->
+            <!--"eventtype": "Tail-Gating-Detected",-->
+            <!--"lat": "13.084478",-->
+            <!--"lon": "77.594025",-->
+            <!--"violationVal": "39",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/customereventvideoire/eventVideoTailGate_353487070524121_353487070524121_20170511133723742_39_5_20170511_142659.mp4"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-27-13-546",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.086197",-->
+            <!--"lon": "77.594711",-->
+            <!--"violationVal": "-1",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_15_476_386_117_93_13_8_20170511_142713.jpg"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-29-19-313",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.106910",-->
+            <!--"lon": "77.602036",-->
+            <!--"violationVal": "-1",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_21_567_371_80_64_41_12_20170511_142919.jpg"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-31-39-992",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.128536",-->
+            <!--"lon": "77.613907",-->
+            <!--"violationVal": "-1",-->
+            <!-- "videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_18_563_378_113_90_31_14_20170511_143140.jpg" -->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-41-38-702",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.194654",-->
+            <!--"lon": "77.651070",-->
+            <!--"violationVal": "-1",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_13_646_421_73_58_37_12_20170511_144139.jpg"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-45-14-571",-->
+            <!--"eventtype": "Traffic-Speed-Violated",-->
+            <!--"lat": "13.198185",-->
+            <!--"lon": "77.678795",-->
+            <!--"violationVal": "21",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/customereventvideoire/eventVideoTrafficSign_353487070524121_353487070524121_20170511133723742_40_20170511_144515.mp4"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-48-10-444",-->
+            <!--"eventtype": "Traffic-Speed-Violated",-->
+            <!--"lat": "13.198011",-->
+            <!--"lon": "77.699654",-->
+            <!--"violationVal": "23",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/customereventvideoire/eventVideoTrafficSign_353487070524121_353487070524121_20170511133723742_20_20170511_144810.mp4"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-48-49-139",-->
+            <!--"eventtype": "Tail-Gating-Voice-Notification",-->
+            <!--"lat": "13.197989",-->
+            <!--"lon": "77.702805",-->
+            <!--"violationVal": "-1",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/lmeventimage/eventTG_Voice_Notification_353487070524121_353487070524121_20170511133723742_11_721_410_137_109_25_7_20170511_144849.jpg"-->
+        <!--},-->
+        <!--{-->
+            <!--"ts": "2017-05-11-14-48-49-139",-->
+            <!--"eventtype": "Tail-Gating-Detected",-->
+            <!--"lat": "13.197989",-->
+            <!--"lon": "77.702805",-->
+            <!--"violationVal": "25",-->
+            <!--"videolink": "https://s3-eu-west-1.amazonaws.com/customereventvideoire/eventVideoTailGate_353487070524121_353487070524121_20170511133723742_25_7_20170511_144849.mp4"-->
+        <!--}-->
+    <!--];-->
+<!--</script>-->
+
+<!--<script >-->
+
+    <!--console.log(markers);-->
+
+    <!--console.log("markers");-->
+
+<!--//    document.write(markers[0].lat);-->
+
+    <!--var mymap = L.map('mapid').setView([markers[0].lat,markers[0].lon], 15);-->
+
+    <!--L.tileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {-->
+        <!--attribution: '&copy;<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',-->
+        <!--subdomains: ['a', 'b', 'c']-->
+    <!--}).addTo( mymap );-->
+
+
+<!--//    L.marker([51.5, -0.09]).addTo(mymap)-->
+<!--//            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();-->
+
+    <!--for ( var i=0; i < markers.length; ++i )-->
+    <!--{-->
+        <!--L.marker( [markers[i].lat, markers[i].lon] )-->
+                <!--.addTo( mymap )-->
+                <!--.bindPopup( '<a href="' + markers[i].videolink + '" target="_blank">' + markers[i].eventtype + '</a>' );-->
+    <!--}-->
+
+    <!--var popup = L.popup();-->
+
+    <!--function onMapClick(e) {-->
+        <!--popup-->
+                <!--.setLatLng(e.latlng)-->
+                <!--.setContent("You clicked the map at " + e.latlng.toString())-->
+                <!--.openOn(mymap);-->
+    <!--}-->
+
+    <!--mymap.on('click', onMapClick);-->
+
+<!--</script>-->
+
+
+
+</body>
+</html>
