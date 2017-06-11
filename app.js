@@ -94,9 +94,9 @@ app.get('/tweetsGet',function(req,res){
 
 console.log("Streaming Live Twitter Feeds...");
 
-// var stream = T.stream('statuses/filter',{ locations : [-180,-90,180,90] , language: 'en' } )
+var stream = T.stream('statuses/filter',{ locations : [-180,-90,180,90] , language: 'en' } )
 // var stream = T.stream('statuses/filter',{ locations : [-74.1687,40.5722,-73.8062,40.9467] , language: 'en' } )
-var stream = T.stream('statuses/filter',{ track: '#GUCCIBOY', language: 'en' } )
+// var stream = T.stream('statuses/filter',{ track: '#GUCCIBOY', language: 'en' } )
 stream.on('tweet', function (tweet) {
 
   // console.log( "\n\nbounding box is  \n" +  tweet.place.bounding_box.coordinates)
@@ -171,7 +171,7 @@ stream.on('tweet', function (tweet) {
 									  	"source" : tweet.source 
 									  }
 									  	);
-	  					  // console.log(jsonData);
+	  					  console.log(tweet);
 
 	  							}
 
